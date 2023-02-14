@@ -1,0 +1,4 @@
+Dependencies:
+
+pytest-watch
+parameterized
