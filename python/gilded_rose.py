@@ -6,57 +6,47 @@ class GildedRose(object):
         self.items = items
 
     def update_quality(self):
+
         for item in self.items:
+
+            # skip sulfuras, don't account for it
+            if item.name == "Sulfuras, Hand of Ragnaros":
+                continue
+
             # UPDATE QUALITY
             # regular item
             if item.name != "Aged Brie" and item.name != "Backstage passes to a TAFKAL80ETC concert":
                 if item.quality > 0:
-                    if item.name != "Sulfuras, Hand of Ragnaros":
-                        # decrease
-                        item.quality = item.quality - 1
+                    # decrease
+                    item.quality -= 1
             else:
                 # not sulfuras
                 if item.quality < 50:
                     # increase
-                    item.quality = item.quality + 1
+                    item.quality += 1
                     # backstage passes
                     if item.name == "Backstage passes to a TAFKAL80ETC concert":
                         # determine how to increase
                         if item.sell_in < 11:
                             if item.quality < 50:
-                                item.quality = item.quality + 1
+                                item.quality += 1
                         if item.sell_in < 6:
                             if item.quality < 50:
-                                item.quality = item.quality + 1
+                                item.quality += 1
 
             # DECREASE SELL IN
-            # not sulfuras
-            if item.name != "Sulfuras, Hand of Ragnaros":
-                # decrease
-                item.sell_in = item.sell_in - 1
+            item.sell_in -= 1
 
-
-            # FOR EXPIRED ITEMS    
+            # FOR EXPIRED ITEMS, continue to update the quality    
             if item.sell_in < 0:
-                # not brie
-                if item.name != "Aged Brie":
-                    # not backstage passes
-                    if item.name != "Backstage passes to a TAFKAL80ETC concert":
-                        # has quality
-                        if item.quality > 0:
-                            # not sulfuras
-                            if item.name != "Sulfuras, Hand of Ragnaros":
-                                # decrease quality - regular item, 2nd decrease
-                                item.quality = item.quality - 1
-                    # backstage passes            
-                    else:
-                        # quality is 0
-                        item.quality = item.quality - item.quality
-                else:
-                # is brie
+                if item.name == "Aged Brie":
                     if item.quality < 50:
-                        # increase while less than 50
-                        item.quality = item.quality + 1
+                        item.quality += 1
+                elif item.name == "Backstage passes to a TAFKAL80ETC concert":
+                    item.quality = 0
+                else: # regular item
+                    if item.quality > 0:
+                        item.quality -= 1
 
 
 class Item:
