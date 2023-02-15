@@ -27,7 +27,16 @@ from gilded_rose_mine import Item, GildedRose
 class GildedRoseTest(unittest.TestCase):
     def setUp(self):
         self.item_1 = Item("foo", 0, 0)
+        self.gilded_rose = GildedRose([self.item_1])
 
+    # does this help? lets say we want to leave some of the initial values, like "foo"
+    def set_instance_vars_for_item(self, name, sell_in, quality):
+        if name is not None:
+            self.item_1.name = name
+        if sell_in is not None:
+            self.item_1.sell_in = sell_in 
+        if quality is not None:
+            self.item_1.quality = quality
 
     # test all items that name doesn't change
     @parameterized.expand([
@@ -37,43 +46,33 @@ class GildedRoseTest(unittest.TestCase):
        ("Sulfuras, Hand of Ragnaros"),
     ])
     def test_that_name_doesnt_change(self, name):
-        self.item_1.name = name
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+        self.set_instance_vars_for_item(name, None, None)
 
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
         
         self.assertEqual(name, self.item_1.name)
 
     # only relevant for regular items that degrade
     def test_that_quality_is_never_negative(self):
-        self.item_1.sell_in = 4
-        self.item_1.quality = 0
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+        self.set_instance_vars_for_item(None, 4, 0)
 
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
         
         self.assertGreaterEqual(self.item_1.quality, 0)
         
     def test_that_sulfuras_quality_doesnt_change(self):
-        self.item_1.name = "Sulfuras, Hand of Ragnaros"
-        self.item_1.quality = 80
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+        self.set_instance_vars_for_item("Sulfuras, Hand of Ragnaros", None, 80)
 
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
         
-        self.assertEqual(80, items[0].quality)
+        self.assertEqual(80, self.item_1.quality)
     
     def test_that_sulfuras_sell_in_doesnt_change(self):
-        self.item_1.name = "Sulfuras, Hand of Ragnaros"
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+        self.set_instance_vars_for_item("Sulfuras, Hand of Ragnaros", None, None)
 
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
         
-        self.assertEqual(0, items[0].sell_in)
+        self.assertEqual(0, self.item_1.sell_in)
 
     # tests that sell in goes down
     @parameterized.expand([
@@ -82,34 +81,29 @@ class GildedRoseTest(unittest.TestCase):
        ("Backstage passes to a TAFKAL80ETC concert")
     ])
     def test_that_sell_in_decreases(self, name):
-        self.item_1.name = name
-        self.item_1.sell_in = 4
-        items = [self.item_1]
+        self.set_instance_vars_for_item(name, 4, None)
 
-        gilded_rose = GildedRose(items)
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
 
-        self.assertEqual(3, items[0].sell_in)
+        self.assertEqual(3, self.item_1.sell_in)
 
-    def test_regular_item_quality_decrease_before_sell_in(self):
-        self.item_1.sell_in = 5
-        self.item_1.quality = 20
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+    def test_regular_item_quality_decreases_by_1_before_sell_in(self):
+        self.set_instance_vars_for_item(None, 5, 20)
 
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
 
-        self.assertEqual(19, items[0].quality)
+        self.assertEqual(19, self.item_1.quality)
     
-    def test_regular_item_quality_decrease_after_sell_in(self):
-        self.item_1.sell_in = -2
-        self.item_1.quality = 20
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+    @parameterized.expand([
+        ("0"),
+        ("-2")
+    ])
+    def test_regular_item_quality_decreases_by_2_after_sell_in(self, sell_in):
+        self.set_instance_vars_for_item(None, int(sell_in), 20)
 
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
         
-        self.assertEqual(18, items[0].quality)
+        self.assertEqual(18, self.item_1.quality)
    
     # test that quality increase for brie and backstage passes
     @parameterized.expand([
@@ -117,41 +111,29 @@ class GildedRoseTest(unittest.TestCase):
        ("Backstage passes to a TAFKAL80ETC concert")
     ])
     def test_that_quality_increases(self, name):
-        self.item_1.name = name
-        self.item_1.sell_in = 30
-        self.item_1.quality = 30
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+        self.set_instance_vars_for_item(name, 30, 30)
 
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
 
-        self.assertEqual(31, items[0].quality)
+        self.assertEqual(31, self.item_1.quality)
 
     @parameterized.expand([
        ("Aged Brie"),
        ("Backstage passes to a TAFKAL80ETC concert")
     ])
     def test_that_quality_doesnt_exceed_50(self, name):
-        self.item_1.name = name
-        self.item_1.sell_in = 3
-        self.item_1.quality = 50
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+        self.set_instance_vars_for_item(name, 3, 50)
 
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
 
-        self.assertEqual(50, items[0].quality)
+        self.assertEqual(50, self.item_1.quality)
 
     def test_that_backstage_quality_is_0_when_sell_in_is_less_than_0(self):
-        self.item_1.name = "Backstage passes to a TAFKAL80ETC concert"
-        self.item_1.sell_in = 0
-        self.item_1.quality = 30
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+        self.set_instance_vars_for_item("Backstage passes to a TAFKAL80ETC concert", 0, 30)
 
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
 
-        self.assertEqual(0, items[0].quality)
+        self.assertEqual(0, self.item_1.quality)
 
     
 #       if <10 days left, quality increases by 2
@@ -163,15 +145,11 @@ class GildedRoseTest(unittest.TestCase):
         ("5")
     ])
     def test_that_backstage_quality_increases_by_3_when_less_than_5_days(self, sell_in):
-        self.item_1.name = "Backstage passes to a TAFKAL80ETC concert"
-        self.item_1.sell_in = int(sell_in)
-        self.item_1.quality = 30
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+        self.set_instance_vars_for_item("Backstage passes to a TAFKAL80ETC concert", int(sell_in), 30)
 
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
 
-        self.assertEqual(33, items[0].quality)
+        self.assertEqual(33, self.item_1.quality)
 
     @parameterized.expand([
         ("6"),
@@ -179,31 +157,22 @@ class GildedRoseTest(unittest.TestCase):
         ("10")
     ])
     def test_that_backstage_quality_increases_by_2_when_less_than_10_days(self, sell_in):
-        self.item_1.name = "Backstage passes to a TAFKAL80ETC concert"
-        self.item_1.sell_in = int(sell_in)
-        self.item_1.quality = 30
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+        self.set_instance_vars_for_item("Backstage passes to a TAFKAL80ETC concert", int(sell_in), 30)
+        
+        self.gilded_rose.update_quality()
 
-        gilded_rose.update_quality()
-
-        self.assertEqual(32, items[0].quality)
+        self.assertEqual(32, self.item_1.quality)
 
     @parameterized.expand([
         ("0"),
         ("-2")
     ])
     def test_that_brie_increase_by_2_after_expiration(self, sell_in):
-        self.item_1.name = "Aged Brie"
-        self.item_1.sell_in = int(sell_in)
-        self.item_1.quality = 30
-        items = [self.item_1]
-        gilded_rose = GildedRose(items)
+        self.set_instance_vars_for_item("Aged Brie", int(sell_in), 30)
 
-        gilded_rose.update_quality()
+        self.gilded_rose.update_quality()
 
-        self.assertEqual(32, items[0].quality)
-
+        self.assertEqual(32, self.item_1.quality)
         
 if __name__ == '__main__':
     unittest.main()
