@@ -3,27 +3,6 @@ import unittest
 from parameterized import parameterized
 from gilded_rose import Item, GildedRose
 
-# Items needed to test:
-#   name never changes
-#   quality never exceeds 50
-#   regular item
-#       sell in goes down by one
-#       quality goes down
-#       if sell by passed, quality goes 2x as fast
-#       quality is never negative
-#   aged brie
-#       quality increases, not exceeding 50
-#   sulfuras
-#       no sell by
-#       quality always 80
-#   backstage passes
-#       quality increases, not exceeding 50
-#       if sell in is 0 quality is 0
-#       if <10 days left, quality increases by 2
-#       if <5 days left, quality increases by 3
-#   conjured
-#       degrade 2x as fast
-
 class GildedRoseTest(unittest.TestCase):
     def setUp(self):
         self.item_1 = Item("foo", 0, 0)
@@ -51,14 +30,6 @@ class GildedRoseTest(unittest.TestCase):
         self.gilded_rose.update_quality()
         
         self.assertEqual(name, self.item_1.name)
-
-    # only relevant for regular items that degrade
-    def test_that_quality_is_never_negative(self):
-        self.set_instance_vars_for_item(None, 4, 0)
-
-        self.gilded_rose.update_quality()
-        
-        self.assertGreaterEqual(self.item_1.quality, 0)
         
     def test_that_sulfuras_quality_doesnt_change(self):
         self.set_instance_vars_for_item("Sulfuras, Hand of Ragnaros", None, 80)
@@ -87,23 +58,49 @@ class GildedRoseTest(unittest.TestCase):
 
         self.assertEqual(3, self.item_1.sell_in)
 
-    def test_regular_item_quality_decreases_by_1_before_sell_in(self):
-        self.set_instance_vars_for_item(None, 5, 20)
-
-        self.gilded_rose.update_quality()
-
-        self.assertEqual(19, self.item_1.quality)
-    
-    @parameterized.expand([
-        ("0"),
-        ("-2")
-    ])
-    def test_regular_item_quality_decreases_by_2_after_sell_in(self, sell_in):
-        self.set_instance_vars_for_item(None, int(sell_in), 20)
+    # only relevant for regular items that degrade
+    def test_that_quality_is_never_negative(self):
+        self.set_instance_vars_for_item(None, 4, 0)
 
         self.gilded_rose.update_quality()
         
-        self.assertEqual(18, self.item_1.quality)
+        self.assertGreaterEqual(self.item_1.quality, 0)
+
+    @parameterized.expand([
+       ("1"),
+       ("25"),
+       ("50")
+    ])
+    def test_regular_item_quality_decreases_by_1_before_sell_in(self, quality):
+        self.set_instance_vars_for_item(None, 5, int(quality))
+
+        self.gilded_rose.update_quality()
+
+        self.assertEqual(int(quality) - 1, self.item_1.quality)
+    
+    @parameterized.expand([
+        ("0", 25),
+        ("0", 50),
+        ("-2", 25),
+        ("-2", 50),
+    ])
+    def test_regular_item_quality_decreases_by_2_after_sell_in_when_can(self, sell_in, quality):
+        self.set_instance_vars_for_item(None, int(sell_in), int(quality))
+
+        self.gilded_rose.update_quality()
+        
+        self.assertEqual(int(quality) - 2, self.item_1.quality)
+
+    @parameterized.expand([
+        ("0", 1),
+        ("-2", 1)
+    ])
+    def test_regular_item_quality_becomes_0_after_sell_in_if_cant_decrease(self, sell_in, quality):
+        self.set_instance_vars_for_item(None, int(sell_in), int(quality))
+
+        self.gilded_rose.update_quality()
+        
+        self.assertEqual(0, self.item_1.quality)
    
     # test that quality increase for brie and backstage passes
     @parameterized.expand([
@@ -118,18 +115,23 @@ class GildedRoseTest(unittest.TestCase):
         self.assertEqual(31, self.item_1.quality)
 
     @parameterized.expand([
-       ("Aged Brie"),
-       ("Backstage passes to a TAFKAL80ETC concert")
+       ("Aged Brie", 3),
+       ("Aged Brie", -3),
+       ("Backstage passes to a TAFKAL80ETC concert", 3)
     ])
-    def test_that_quality_doesnt_exceed_50(self, name):
-        self.set_instance_vars_for_item(name, 3, 50)
+    def test_that_quality_doesnt_exceed_50(self, name, sell_in):
+        self.set_instance_vars_for_item(name, int(sell_in), 49)
 
         self.gilded_rose.update_quality()
 
         self.assertEqual(50, self.item_1.quality)
 
-    def test_that_backstage_quality_is_0_when_sell_in_is_less_than_0(self):
-        self.set_instance_vars_for_item("Backstage passes to a TAFKAL80ETC concert", 0, 30)
+    @parameterized.expand([
+        ("0"),
+        ("-3")
+    ])
+    def test_that_backstage_quality_is_0_when_sell_in_is_less_than_0(self, sell_in):
+        self.set_instance_vars_for_item("Backstage passes to a TAFKAL80ETC concert", int(sell_in), 30)
 
         self.gilded_rose.update_quality()
 
