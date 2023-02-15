@@ -29,6 +29,9 @@ class GildedRose(object):
                     self.increase_quality(item)
                 if item.sell_in < 6:
                     self.increase_quality(item)
+            elif item.name == "Conjured":
+                self.decrease_quality(item)
+                self.decrease_quality(item)
             else: # regular item
                 self.decrease_quality(item)
                 
@@ -41,6 +44,9 @@ class GildedRose(object):
                     self.increase_quality(item)
                 elif item.name == "Backstage passes to a TAFKAL80ETC concert":
                     item.quality = 0
+                elif item.name == "Conjured":
+                    self.decrease_quality(item)
+                    self.decrease_quality(item)
                 else: # regular item
                     self.decrease_quality(item)
 
