@@ -8,7 +8,6 @@ class GildedRoseTest(unittest.TestCase):
         self.item_1 = Item("foo", 0, 0)
         self.gilded_rose = GildedRose([self.item_1])
 
-    # does this help? lets say we want to leave some of the initial values, like "foo"
     def set_instance_vars_for_item(self, name, sell_in, quality):
         if name is not None:
             self.item_1.name = name
@@ -17,7 +16,6 @@ class GildedRoseTest(unittest.TestCase):
         if quality is not None:
             self.item_1.quality = quality
 
-    # test all items that name doesn't change
     @parameterized.expand([
        ("Bread"),
        ("Aged Brie"),
@@ -45,21 +43,19 @@ class GildedRoseTest(unittest.TestCase):
         
         self.assertEqual(0, self.item_1.sell_in)
 
-    # tests that sell in goes down
     @parameterized.expand([
        ("Bread"),
        ("Aged Brie"),
        ("Backstage passes to a TAFKAL80ETC concert")
     ])
-    def test_that_sell_in_decreases(self, name):
+    def test_that_sell_in_decreases_for_regular_items(self, name):
         self.set_instance_vars_for_item(name, 4, None)
 
         self.gilded_rose.update_quality()
 
         self.assertEqual(3, self.item_1.sell_in)
 
-    # only relevant for regular items that degrade
-    def test_that_quality_is_never_negative(self):
+    def test_that_quality_is_never_negative_for_regular_items(self):
         self.set_instance_vars_for_item(None, 4, 0)
 
         self.gilded_rose.update_quality()
@@ -102,12 +98,11 @@ class GildedRoseTest(unittest.TestCase):
         
         self.assertEqual(0, self.item_1.quality)
    
-    # test that quality increase for brie and backstage passes
     @parameterized.expand([
        ("Aged Brie"),
        ("Backstage passes to a TAFKAL80ETC concert")
     ])
-    def test_that_quality_increases(self, name):
+    def test_that_quality_increases_for_brie_and_passes(self, name):
         self.set_instance_vars_for_item(name, 30, 30)
 
         self.gilded_rose.update_quality()
@@ -136,10 +131,6 @@ class GildedRoseTest(unittest.TestCase):
         self.gilded_rose.update_quality()
 
         self.assertEqual(0, self.item_1.quality)
-
-    
-#       if <10 days left, quality increases by 2
-#       if <5 days left, quality increases by 3
 
     @parameterized.expand([
         ("1"),
