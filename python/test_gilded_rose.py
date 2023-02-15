@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import unittest
 from parameterized import parameterized
-from gilded_rose_mine import Item, GildedRose
+from gilded_rose import Item, GildedRose
 
 # Items needed to test:
 #   name never changes
