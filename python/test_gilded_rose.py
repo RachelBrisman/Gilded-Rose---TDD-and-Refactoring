@@ -1,14 +1,14 @@
 # -*- coding: utf-8 -*-
 import unittest
 from parameterized import parameterized
-from gilded_rose import Item, GildedRose
+from gilded_rose_mine import Item, GildedRose
 
 class GildedRoseTest(unittest.TestCase):
     def setUp(self):
         self.item_1 = Item("foo", 0, 0)
         self.gilded_rose = GildedRose([self.item_1])
 
-    def set_instance_vars_for_item(self, name, sell_in, quality):
+    def set_instance_vars_for_item(self, name = None, sell_in = None, quality = None):
         if name is not None:
             self.item_1.name = name
         if sell_in is not None:
@@ -23,21 +23,21 @@ class GildedRoseTest(unittest.TestCase):
        ("Sulfuras, Hand of Ragnaros"),
     ])
     def test_that_name_doesnt_change(self, name):
-        self.set_instance_vars_for_item(name, None, None)
+        self.set_instance_vars_for_item(name = name)
 
         self.gilded_rose.update_quality()
         
         self.assertEqual(name, self.item_1.name)
         
     def test_that_sulfuras_quality_doesnt_change(self):
-        self.set_instance_vars_for_item("Sulfuras, Hand of Ragnaros", None, 80)
+        self.set_instance_vars_for_item(name = "Sulfuras, Hand of Ragnaros", quality = 80)
 
         self.gilded_rose.update_quality()
         
         self.assertEqual(80, self.item_1.quality)
     
     def test_that_sulfuras_sell_in_doesnt_change(self):
-        self.set_instance_vars_for_item("Sulfuras, Hand of Ragnaros", None, None)
+        self.set_instance_vars_for_item(name = "Sulfuras, Hand of Ragnaros")
 
         self.gilded_rose.update_quality()
         
@@ -49,7 +49,7 @@ class GildedRoseTest(unittest.TestCase):
        ("Backstage passes to a TAFKAL80ETC concert")
     ])
     def test_that_sell_in_decreases_for_regular_items(self, name):
-        self.set_instance_vars_for_item(name, 4, None)
+        self.set_instance_vars_for_item(name = name, sell_in = 4)
 
         self.gilded_rose.update_quality()
 

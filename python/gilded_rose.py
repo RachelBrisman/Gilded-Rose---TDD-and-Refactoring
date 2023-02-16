@@ -50,6 +50,8 @@ class GildedRose(object):
                 else: # regular item
                     self.decrease_quality(item, 1)
 
+
+
 class Item:
     def __init__(self, name, sell_in, quality):
         self.name = name
@@ -58,3 +60,4 @@ class Item:
 
     def __repr__(self):
         return "%s, %s, %s" % (self.name, self.sell_in, self.quality)
+    

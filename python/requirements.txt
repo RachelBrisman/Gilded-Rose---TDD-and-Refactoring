@@ -2,3 +2,4 @@ Dependencies:
 
 pytest-watch
 parameterized
+pytest --cov-report
