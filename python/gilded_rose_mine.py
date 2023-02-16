@@ -24,6 +24,10 @@ class GildedRose(object):
             # decrease sell in 
             current_item.sell_in -= 1
 
+            # updater = ItemUpdater()
+
+            # updater.update(current_item)
+
             # determine which method to call
             match current_item.name:
                 case "Aged Brie":
@@ -35,7 +39,6 @@ class GildedRose(object):
                 case _:
                     UpdateRegular.update(self, current_item)
 
-
 class Item:
     def __init__(self, name, sell_in, quality):
         self.name = name
@@ -46,7 +49,7 @@ class Item:
         return "%s, %s, %s" % (self.name, self.sell_in, self.quality)
  
 class ItemUpdater():
-    def update(self):
+    def update(self, current_item):
         return
 
 class UpdateAgedBrie(ItemUpdater):
@@ -81,5 +84,5 @@ class UpdateRegular(ItemUpdater):
             self.decrease_quality(item, 1)
             
 class UpdateSulfuras(ItemUpdater):
-    def update(item):
-        return
+    def update(self, item):
+        return  
