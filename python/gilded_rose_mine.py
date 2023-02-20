@@ -29,15 +29,15 @@ class GildedRose(object):
             # updater.update(current_item)
 
             # determine which method to call
-            match current_item.name:
-                case "Aged Brie":
-                    UpdateAgedBrie.update(self, current_item)
-                case "Backstage passes to a TAFKAL80ETC concert":
-                    UpdatePasses.update(self, current_item)
-                case "Conjured":
-                    UpdateConjured.update(self, current_item)
-                case _:
-                    UpdateRegular.update(self, current_item)
+            # match current_item.name:
+            #     case "Aged Brie":
+            #         UpdateAgedBrie.update(self, current_item)
+            #     case "Backstage passes to a TAFKAL80ETC concert":
+            #         UpdatePasses.update(self, current_item)
+            #     case "Conjured":
+            #         UpdateConjured.update(self, current_item)
+            #     case _:
+            #         UpdateRegular.update(self, current_item)
 
 class Item:
     def __init__(self, name, sell_in, quality):
@@ -48,7 +48,7 @@ class Item:
     def __repr__(self):
         return "%s, %s, %s" % (self.name, self.sell_in, self.quality)
  
-class ItemUpdater():
+class ItemUpdater:
     def update(self, current_item):
         return
 
@@ -64,7 +64,6 @@ class UpdatePasses(ItemUpdater):
             item.quality = 0
         else:
             self.increase_quality(item, 1)
-
             if item.sell_in < 10:
                 self.increase_quality(item, 1)
 
