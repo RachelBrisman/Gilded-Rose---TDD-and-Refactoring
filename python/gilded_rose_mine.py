@@ -5,16 +5,6 @@ class GildedRose(object):
     def __init__(self, items):
         self.items = items
 
-    def increase_quality(self, item, times):
-        for x in range(times):
-            if item.quality < 50:
-                item.quality += 1
-    
-    def decrease_quality(self, item, times):
-        for x in range(times):
-            if item.quality > 0:
-                item.quality -= 1
-
     def update_quality(self):
         for current_item in self.items:
             # if sulfuras, skip this item (it doesn't change)
@@ -24,20 +14,19 @@ class GildedRose(object):
             # decrease sell in 
             current_item.sell_in -= 1
 
-            # updater = ItemUpdater()
-
-            # updater.update(current_item)
-
             # determine which method to call
             # match current_item.name:
             #     case "Aged Brie":
-            #         UpdateAgedBrie.update(self, current_item)
+            #         updater = UpdateAgedBrie()
             #     case "Backstage passes to a TAFKAL80ETC concert":
-            #         UpdatePasses.update(self, current_item)
+            #         updater = UpdatePasses()
             #     case "Conjured":
-            #         UpdateConjured.update(self, current_item)
+            #         updater = UpdateConjured()
             #     case _:
-            #         UpdateRegular.update(self, current_item)
+            #         updater = UpdateRegular()
+            
+            updater = ItemUpdater()
+            updater.update(current_item)
 
 class Item:
     def __init__(self, name, sell_in, quality):
@@ -50,11 +39,21 @@ class Item:
  
 class ItemUpdater:
     def update(self, current_item):
-        return
+        pass
+
+    def increase_quality(self, item, times):
+        for x in range(times):
+            if item.quality < 50:
+                item.quality += 1
+    
+    def decrease_quality(self, item, times):
+        for x in range(times):
+            if item.quality > 0:
+                item.quality -= 1
 
 class UpdateAgedBrie(ItemUpdater):
     def update(self, item):
-        self.increase_quality(item, 1)
+        self.increase_quality(item, 1)        
         if item.sell_in < 0:
             self.increase_quality(item, 1)        
     
@@ -66,7 +65,6 @@ class UpdatePasses(ItemUpdater):
             self.increase_quality(item, 1)
             if item.sell_in < 10:
                 self.increase_quality(item, 1)
-
             if item.sell_in < 5:
                 self.increase_quality(item, 1)
     
@@ -81,7 +79,3 @@ class UpdateRegular(ItemUpdater):
         self.decrease_quality(item, 1)
         if item.sell_in < 0:
             self.decrease_quality(item, 1)
-            
-class UpdateSulfuras(ItemUpdater):
-    def update(self, item):
-        return  
