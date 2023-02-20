@@ -7,27 +7,29 @@ class GildedRose(object):
 
     def update_quality(self):
         for current_item in self.items:
-            # if sulfuras, skip this item (it doesn't change)
-            if current_item.name == "Sulfuras, Hand of Ragnaros":
-                continue
 
-            # decrease sell in 
-            current_item.sell_in -= 1
+            updater = self.get_updater(current_item)
 
-            # determine which method to call
-            # match current_item.name:
-            #     case "Aged Brie":
-            #         updater = UpdateAgedBrie()
-            #     case "Backstage passes to a TAFKAL80ETC concert":
-            #         updater = UpdatePasses()
-            #     case "Conjured":
-            #         updater = UpdateConjured()
-            #     case _:
-            #         updater = UpdateRegular()
-            
-            updater = ItemUpdater()
             updater.update(current_item)
 
+    def get_updater(self, current_item):
+        name = current_item.name
+        if name == ItemName.aged_brie:
+            return UpdateAgedBrie()
+        if name == ItemName.passes:
+            return UpdatePasses()
+        if name == ItemName.conjured:
+            return UpdateConjured()
+        if name == ItemName.sulfuras:
+            return UpdateSulfuras()
+        return UpdateRegular()
+    
+class ItemName:
+    aged_brie = "Aged Brie"
+    passes = "Backstage passes to a TAFKAL80ETC concert"
+    conjured = "Conjured"
+    sulfuras = "Sulfuras, Hand of Ragnaros"
+        
 class Item:
     def __init__(self, name, sell_in, quality):
         self.name = name
@@ -51,14 +53,19 @@ class ItemUpdater:
             if item.quality > 0:
                 item.quality -= 1
 
+    def update_sell_in(self, item):
+        item.sell_in -= 1
+
 class UpdateAgedBrie(ItemUpdater):
     def update(self, item):
+        self.update_sell_in(item)
         self.increase_quality(item, 1)        
         if item.sell_in < 0:
             self.increase_quality(item, 1)        
     
 class UpdatePasses(ItemUpdater):
     def update(self, item):
+        self.update_sell_in(item)
         if item.sell_in < 0:
             item.quality = 0
         else:
@@ -70,12 +77,18 @@ class UpdatePasses(ItemUpdater):
     
 class UpdateConjured(ItemUpdater):
     def update(self, item):
+        self.update_sell_in(item)
         self.decrease_quality(item, 2)
         if item.sell_in < 0:
             self.decrease_quality(item, 2)
 
 class UpdateRegular(ItemUpdater):
     def update(self, item):
+        self.update_sell_in(item)
         self.decrease_quality(item, 1)
         if item.sell_in < 0:
             self.decrease_quality(item, 1)
+
+class UpdateSulfuras(ItemUpdater):
+    def update(self, item):
+        pass
